@@ -392,6 +392,7 @@ def progress_json(pid: str):
 async def detect_service(
     file: UploadFile = File(...),
     progress_id: str = Form(None),   # ★ 추가
+    preprocess: int = Form(0),
 ):
     # 진행ID 없으면 생성
     pid = progress_id or str(uuid.uuid4())
@@ -413,7 +414,9 @@ async def detect_service(
     if s > 1.0:
         bgr = cv2.resize(bgr, (int(w/s), int(h/s)), interpolation=cv2.INTER_AREA)
 
-    text, mean_conf, items, vis = _run_ocr(bgr, progress_id=pid)
+    text, mean_conf, items, vis = _run_ocr(
+        bgr, progress_id=pid, use_preprocess=bool(preprocess)
+    )
 
     # base64로 인코딩
     vis_rgb = cv2.cvtColor(vis, cv2.COLOR_BGR2RGB)
