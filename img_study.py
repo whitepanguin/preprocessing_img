@@ -36,8 +36,8 @@ print(font_name)  # 'Malgun Gothic' 등 폰트 이름 출력 확인
 plt.rc('font', family=font_name)
 
 # 파일 경로
-image_path = "insure_00112.jpg"
-json_path = "insure_00112.json"
+image_path = "insure_00001.jpeg"
+json_path = "insure_00001.json"
 
 # 이미지 읽기 (OpenCV, BGR)
 image = cv2.imread(image_path)
@@ -90,10 +90,13 @@ for y in range(4):
         dst_ = dst2[y*bh:(y+1)*bh, x*bw:(x+1)*bw]
         cv2.threshold(img_, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU, dst_)
 
+gse = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+img_gray = cv2.dilate(~dst2, gse)
+img_die = cv2.erode(img_gray, gse)
 
 # 이미지 자르기
 # 회색으로 받은 이미지를 반전해서 사각형 찾기
-_, img_gray = cv2.threshold(dst2, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+_, img_gray = cv2.threshold(~img_die, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
 
 contours, _ = cv2.findContours(img_gray,cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 dst = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
@@ -169,7 +172,7 @@ else:
 
     # 5) 투시 변환 매트릭스 계산 및 적용
     M = cv2.getPerspectiveTransform(ordered_box, dst_pts)
-    warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+    warped = cv2.warpPerspective(img_noi, M, (maxWidth, maxHeight))
     warped = cv2.resize(warped, dim, interpolation=cv2.INTER_AREA)
     cv2.imshow("warped transform", warped)
 
@@ -188,6 +191,8 @@ dst2 = cv2.resize(dst2, dim, interpolation=cv2.INTER_AREA)
 cv2.imshow('3 dst2', dst2)
 dst = cv2.resize(dst, dim, interpolation=cv2.INTER_AREA)
 cv2.imshow('4 dst', dst)
+img_die = cv2.resize(img_die, dim, interpolation=cv2.INTER_AREA)
+cv2.imshow('4 img_die', img_die)
 # cv2.imshow('5 warped', warped)
 
 #----
