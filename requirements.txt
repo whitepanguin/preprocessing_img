@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pydantic>=1.10,<3
+python-multipart
+requests
+
+easyocr
+opencv-python-headless
+numpy
+
+# PyTorch(CPU) 별도 설치:
+# pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio
